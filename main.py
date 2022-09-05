@@ -4,6 +4,7 @@ import face_recognition
 import os
 from datetime import datetime
 import pyodbc
+import mysql.connector
 
 path = 'Employees_Images'
 images = []
@@ -11,6 +12,7 @@ imgLabel = []
 mylst = os.listdir(path)
 
 for cl in mylst:
+    # current employees image
     curimg = cv2.imread(f'{path}\\{cl}')
     images.append(curimg)
     imgLabel.append(os.path.splitext(cl)[0])
@@ -33,10 +35,11 @@ def markAttendance2(name, inTime, InDate):
                           'Server=DESKTOP-SUS92RI;'
                           'Database=attendancedb;'
                           'Trusted_Connection=yes;')
+    # conn = mysql.connector.connect(host='localhost', user='root', password='', database='Attendance')
 
     cursor = conn.cursor()
 
-    sql = '''insert into attendancedb.dbo.tbl_attendance (Name,InDate,InTime) values(?, ?, ?)'''
+    sql = '''Insert into attendancedb.dbo.tbl_attendance (Name,InDate,InTime) values(?, ?, ?)'''
 
     val = (name, InDate, inTime)
     cursor.execute(sql, val)
@@ -74,6 +77,8 @@ while True:
             if name != nm:
                 markAttendance2(name, str(crTime), str(crDate))
                 nm = name
+            else:
+                print('not matched')
 
     cv2.imshow('Frame', img)
     if cv2.waitKey(1) & 0xFF == ord('q'):
